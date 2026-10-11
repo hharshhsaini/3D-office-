@@ -1,4 +1,4 @@
-import { CEILING_HEIGHT, CORRIDOR as K } from '../config/layout'
+import { CEILING_HEIGHT, CORRIDOR as K, INTERVIEW_CABIN as C, WALL_THICKNESS } from '../config/layout'
 import { alongToLocal, localRectToWorld, localToWorld, rangeToLocal, wallTransform } from './frames'
 import { CeilingPatch, FloorPatch } from './primitives'
 import { GlassPartition } from './GlassPartition'
@@ -8,7 +8,7 @@ import { LinearLed } from './Lights'
  * Start of the office corridor (towards the main office and the cabins).
  * Narrow, lined with black-framed glass partitions and doors, with a white
  * linear LED down the centre, as in the corridor photograph.
- * It leaves the lobby through K.wall (the left wall) – never behind the desk.
+ * It leaves the lobby through K.wall (the right wall) – never behind the desk.
  * Built in that wall's frame; the corridor lies beyond the wall (local Z < 0).
  */
 export function Corridor() {
@@ -24,6 +24,18 @@ export function Corridor() {
   const bandRight = K.redBand.side === 'right'
   const band = { bottom: K.redBand.bottomY, height: K.redBand.height }
   const endDoorW = 0.95
+
+  // Where the interview cabin sits right next to the corridor on the same wall,
+  // the cabin's solid side wall is the corridor wall, so the glass starts after it.
+  const t = WALL_THICKNESS
+  const near = (a: number, b: number) => Math.abs(a - b) < 0.05
+  const sameWall = C.wall === K.wall
+  const cabinAfterTo = sameWall && near(C.fromZ, K.toZ + t)
+  const cabinBeforeFrom = sameWall && near(C.toZ, K.fromZ - t)
+  const toIsX1 = alongToLocal(K.wall, K.toZ) === x1
+  const skip = C.depth + t
+  const skipX1 = (toIsX1 ? cabinAfterTo : cabinBeforeFrom) ? skip : 0
+  const skipX0 = (toIsX1 ? cabinBeforeFrom : cabinAfterTo) ? skip : 0
 
   return (
     <>
@@ -42,10 +54,10 @@ export function Corridor() {
         />
         {/* side partitions running along the corridor */}
         <group position={[x0, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
-          <GlassPartition from={0} to={L} z={-0.035} frosted={K.frostedSideGlass} band={bandRight ? undefined : band} />
+          <GlassPartition from={skipX0} to={L} z={-0.035} frosted={K.frostedSideGlass} band={bandRight ? undefined : band} />
         </group>
         <group position={[x1, 0, 0]} rotation={[0, -Math.PI / 2, 0]}>
-          <GlassPartition from={-L} to={0} z={-0.035} frosted={K.frostedSideGlass} band={bandRight ? band : undefined} />
+          <GlassPartition from={-L} to={-skipX1} z={-0.035} frosted={K.frostedSideGlass} band={bandRight ? band : undefined} />
         </group>
         {/* end of this phase: glass door on to the main office */}
         <group position={[0, 0, -L]}>

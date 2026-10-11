@@ -50,33 +50,33 @@ URL parameters:
 ![Plan view](docs/screenshots/02-plan-view.jpg)
 
 ```
-                    BACK WALL (logo + window) – closed, no doorway
-          ┌──────────────────────────────────────┐
-          │        [ RECEPTION  DESK ]    [win]  │▐ RED FEATURE
-          │                                      │▐ WALL + BENCH
-          │                                      │▐
- corridor │                                      │
- ◄════════╡ glass door                           ├────┐
- to office│                                      │ IC │ INTERVIEW
-          │ plant                                │    │ CABIN
-          └────────────[ ENTRANCE ]──────────────┴────┘
-                            ▲ visitor
+              BACK WALL (logo + window) – closed, no doorway
+        ┌─────────────────────────────────┐
+        │   [ RECEPTION  DESK ]   [win]   │▐ RED FEATURE
+        │                                 │▐ WALL + BENCH
+        │                                 │▐
+        │                      glass door ╞═════════════► corridor to the
+        │                                 ├────┐           main office
+        │ plant                           │ IC │ INTERVIEW CABIN
+        └──────────[ ENTRANCE ]───────────┴────┘
+                         ▲ visitor
 ```
+
+The lobby is about 5.0 × 5.4 m (estimate).
 
 - **Entrance:** a black-framed double glass door in the front (bottom) wall. The visitor walks in facing the back wall.
 - **Reception desk:** directly in front of the entrance, on the same centre line, with its front facing the entrance. It has a white marble-style front panel, natural wood end blocks, a warm LED glow under the panel, a marble ledge, and a receptionist work surface with a monitor behind it.
 - **Wall behind the desk:** a closed wall. It carries a feature panel with the dark Spacewire "S" and "Spacewire Tech" in 3D letters, three pendant lights, and a window to the right of the logo, as in the latest reception reference. There is no corridor, hallway or doorway behind the desk.
 - **Red feature wall:** on the right side wall, directly to the visitor's right. It has a natural wood box frame, a deep-red chevron upholstered panel, a large white "S", a built-in red cushioned bench (3 cushions) and warm downlights in the top of the frame. It is not behind the desk.
-- **Small interview cabin:** a very small enclosed room (about 1.5 × 1.85 m) next to the entrance on the right. It has a black-framed glass front and glass door, and holds one chair and one small round table, nothing else.
-- **Office corridor:** starts beyond the reception area, through a black-framed glass partition and door in the left wall. It is narrow (1.6 m), with glass partitions on both sides, a red band on the right-hand glass and a white linear LED down the centre, as in the corridor photo. The 5 m stub ends at a glass door to the main office, which is the next phase. The corridor glass is frosted for now, because the rooms behind it are not built yet.
+- **Small interview cabin:** a very small enclosed room (about 1.4 × 1.6 m) next to the entrance on the right. It has a black-framed glass front and glass door, and holds one chair and one small round table, nothing else.
+- **Office corridor:** starts beyond the reception area, through a black-framed glass partition and door in the right wall, between the red feature wall and the interview cabin. Where the corridor runs beside the cabin, the cabin's solid side wall forms the corridor wall. It is narrow (1.3 m), with glass partitions, a red band on the right-hand glass and a white linear LED down the centre, as in the corridor photo. The 4 m stub ends at a glass door to the main office, which is the next phase. The corridor glass is frosted for now, because the rooms behind it are not built yet.
 - **Materials and lighting:** large light-grey square floor tiles, warm off-white walls, black aluminium frames, white linear LED strips, and warm recessed lights and pendants. Shadows are real-time.
 
-### ⚠ Please confirm
+### Review status
 
-1. **Hand-drawn floor plan:** it was not among the images received. Only two arrived: the reference board (exterior, generated floor plan and labelled photos) and the generated reception concept. The layout therefore follows your written description, the photo captions ("Reception – straight after entrance", "Red wall – right side after entrance", "Interview cabin – next to entrance, before slab", "Main corridor – towards office") and the latest reception concept. The generated floor plan was used only where it does not contradict your description.
-2. **Interview cabin position:** it is placed right next to the entrance on the right-hand side, because both the generated plan and the reception concept put it there. That puts it on the same side as the red wall, separated by a solid wall section. If your drawing shows it elsewhere, change `INTERVIEW_CABIN` in `src/config/layout.ts`.
-3. **Corridor side:** it leaves through the left wall. The back wall must stay closed and the right side holds the red wall and the cabin, so the left is the only remaining side. Change `CORRIDOR` if your plan differs.
-4. **Dimensions:** all are reasonable estimates and are marked `ESTIMATE` in the config. Measured sizes can be typed in directly.
+- **Confirmed in review:** entrance, reception desk, window wall, red feature wall and interview cabin positions. The corridor was moved from the left wall to the right wall and all sizes were made more compact, as requested.
+- **Dimensions:** all are reasonable estimates and are marked `ESTIMATE` in the config. Measured sizes can be typed in directly.
+- **Source:** the hand-drawn floor plan was not among the images received. The layout follows the written brief, the photo captions, the latest reception concept and the review feedback above.
 
 ## Adjusting the layout
 
