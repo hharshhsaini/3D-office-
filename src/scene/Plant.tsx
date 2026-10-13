@@ -5,7 +5,7 @@ import { getMaterials } from './materials'
 /** Simple procedural potted plant (long-leaved, like the ones in the references). */
 
 let leafGeometry: THREE.BufferGeometry | null = null
-function getLeafGeometry() {
+export function getLeafGeometry() {
   if (leafGeometry) return leafGeometry
   const g = new THREE.PlaneGeometry(1, 1, 2, 12)
   g.translate(0, 0.5, 0)

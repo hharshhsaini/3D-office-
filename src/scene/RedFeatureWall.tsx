@@ -1,23 +1,33 @@
 import { Suspense, useMemo } from 'react'
 import * as THREE from 'three'
-import { RED_FEATURE_WALL as R } from '../config/layout'
+import { GRID, INTERIOR_WALL, RECEPTION } from '../config/office'
 import { getMaterials } from './materials'
 import { BoxFromTo } from './primitives'
 import { LogoMark } from './SpacewireLogo'
 import { Downlight, LIGHT_LEVELS } from './Lights'
-import { rangeToLocal, wallTransform } from './frames'
 import { RoundedBox } from '@react-three/drei'
 
 /**
  * Spacewire Tech red feature wall: natural wood box frame projecting from the
  * wall, red chevron-patterned upholstered back panel with the large white "S",
  * built-in red cushioned bench, warm downlights in the top of the frame.
- * Modelled in the wall frame of R.wall (local X along the wall, +Z into the lobby).
+ * Mounted on the south face of the Actors cabin wall, facing the reception
+ * (local X = world X, local +Z = south, into the reception).
  */
+const R = {
+  ...RECEPTION.redWall,
+  frameThickness: 0.07,
+  logoDepth: 0.03,
+  cushionThickness: 0.1,
+  downlights: 3,
+}
+
 export function RedFeatureWall() {
   const m = getMaterials()
-  const { position, rotationY } = wallTransform(R.wall)
-  const [x0, x1] = rangeToLocal(R.wall, R.fromZ, R.toZ)
+  const position: [number, number, number] = [0, 0, GRID.receptionNorth + INTERIOR_WALL / 2]
+  const rotationY = 0
+  const x0 = R.x0
+  const x1 = R.x1
   const t = R.frameThickness
   const ix0 = x0 + t
   const ix1 = x1 - t
@@ -36,7 +46,7 @@ export function RedFeatureWall() {
   }, [innerW, innerH])
 
   const cushionGap = 0.012
-  const cushionW = (innerW - cushionGap * (R.benchCushions + 1)) / R.benchCushions
+  const cushionW = (innerW - cushionGap * (R.cushions + 1)) / R.cushions
   const cushionD = R.depth - 0.05
 
   return (
@@ -53,13 +63,13 @@ export function RedFeatureWall() {
 
       {/* large white S */}
       <Suspense fallback={null}>
-        <group position={[cx, R.logoCenterY, 0.025]}>
+        <group position={[cx, R.logoY, 0.025]}>
           <LogoMark height={R.logoHeight} depth={R.logoDepth} material={m.logoWhite} />
         </group>
       </Suspense>
 
       {/* red cushioned bench seat */}
-      {Array.from({ length: R.benchCushions }, (_, i) => {
+      {Array.from({ length: R.cushions }, (_, i) => {
         const a = ix0 + cushionGap + i * (cushionW + cushionGap)
         return (
           <RoundedBox
@@ -90,6 +100,7 @@ export function RedFeatureWall() {
             aim={[x, iy0, 0.05]}
             inCeiling={false}
             castShadow={i === Math.floor(R.downlights / 2)}
+            light={i === Math.floor(R.downlights / 2)}
           />
         )
       })}

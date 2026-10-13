@@ -113,23 +113,168 @@ canvas:active {
   user-select: none;
 }
 
-.plan-labels {
+.hotspots {
   position: fixed;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
 }
 
-.plan-label {
+.hotspot {
   position: absolute;
   top: 0;
   left: 0;
-  padding: 3px 8px;
-  border-radius: 5px;
-  background: rgba(15, 15, 15, 0.85);
+  padding: 4px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  background: rgba(15, 15, 15, 0.82);
   color: #fff;
+  font: inherit;
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.hotspot:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.hotspot.static {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.crosshair {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
   pointer-events: none;
+}
+
+.area-badge {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  background: var(--panel-bg);
+  color: var(--panel-fg);
+  font-size: 13px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.area-badge:empty {
+  display: none;
+}
+
+.lock-hint {
+  position: fixed;
+  top: calc(50% + 22px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.minimap {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: 132px;
+  padding: 6px;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(250, 250, 248, 0.9);
+  cursor: pointer;
+}
+
+.minimap svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.plan-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 12px;
+  background: #fbfaf7;
+  overflow: hidden;
+}
+
+.plan-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #333;
+}
+
+.plan-head button {
+  border: 0;
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.plan-svg {
+  display: block;
+  height: calc(100vh - 110px);
+  max-width: calc(100vw - 32px);
+  padding: 0 14px 14px;
+}
+
+.plan-text {
+  font-size: 0.34px;
+  font-weight: 600;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  fill: #1d1d1d;
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 0.08px;
+  pointer-events: none;
+}
+
+.plan-text.clickable {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.plan-text.muted {
+  fill: #8a8a8a;
+}
+
+@media (max-width: 640px) {
+  .help {
+    display: none;
+  }
 }

@@ -1,22 +1,24 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
-import { RECEPTION_DESK as D, DESK_CENTER_Z, DESK_PLANTS } from '../config/layout'
+import { RECEPTION } from '../config/office'
 import { COLORS } from '../config/appearance'
 import { getMaterials } from './materials'
-import { BoxFromTo } from './primitives'
+import { BoxFromTo, facingToRotationY } from './primitives'
 import { Monitor } from './Furniture'
 import { Plant } from './Plant'
-import { deg } from './frames'
 
 /**
  * Reception desk: white marble-style front panel between two natural wood end
  * blocks, recessed plinth with a warm LED glow, marble transaction ledge and a
  * lower receptionist work surface behind it.
  * Local origin = desk centre on the floor; the front (visitor side) faces +Z.
+ * In the office the desk faces east, towards the main entrance.
  */
+const D = RECEPTION.desk
+
 export function ReceptionDesk() {
   const m = getMaterials()
-  const W = D.width
+  const W = D.length
   const H = D.height
   const halfD = D.depth / 2
   const xL = -W / 2
@@ -39,7 +41,7 @@ export function ReceptionDesk() {
   }, [W, H, xMarbleL, xMarbleR])
 
   return (
-    <group position={[D.centerX, 0, DESK_CENTER_Z]} rotation={[0, deg(D.rotationDeg), 0]}>
+    <group position={[D.center[0], 0, D.center[1]]} rotation={[0, facingToRotationY(-90), 0]}>
       {/* wooden end blocks */}
       <BoxFromTo min={[xL, 0, -halfD]} max={[xMarbleL, H, halfD]} material={m.wood} />
       <BoxFromTo min={[xMarbleR, 0, -halfD]} max={[xR, H, halfD + 0.02]} material={m.wood} />
@@ -93,8 +95,8 @@ export function ReceptionDesk() {
       <Monitor position={[xMarbleL + 0.75, D.workSurfaceHeight, -0.08]} />
 
       {/* plants on the wooden end blocks, as in the reference */}
-      {DESK_PLANTS.left && <Plant kind="desk" position={[(xL + xMarbleL) / 2, H, 0]} seed={3} />}
-      {DESK_PLANTS.right && <Plant kind="deskSmall" position={[(xMarbleR + xR) / 2, H, 0.05]} seed={5} />}
+      <Plant kind="desk" position={[(xL + xMarbleL) / 2, H, 0]} seed={3} />
+      <Plant kind="deskSmall" position={[(xMarbleR + xR) / 2, H, 0.05]} seed={5} />
     </group>
   )
 }

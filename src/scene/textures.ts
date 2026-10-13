@@ -280,3 +280,143 @@ export function windowViewTexture() {
     return toTexture(c, true)
   })
 }
+
+/**
+ * Warm wooden floor laid in a herringbone-style pattern (open workspace).
+ * One repeat = WOOD_FLOOR_REPEAT metres. Returns colour + roughness maps.
+ */
+export function herringboneWoodTextures() {
+  return cached('herringbone', () => {
+    const S = 1024
+    const cols = 6 // plank columns per repeat
+    const colW = S / cols
+    const step = colW * 0.42 // vertical distance between plank edges
+    const color = canvas(S, S)
+    const rough = canvas(S, S)
+    const rand = mulberry32(42)
+    const a = hexToRgb(COLORS.woodFloorLight)
+    const b = hexToRgb(COLORS.woodFloorDark)
+    color.ctx.fillStyle = '#6b4a2b'
+    color.ctx.fillRect(0, 0, S, S)
+    rough.ctx.fillStyle = '#9a9a9a'
+    rough.ctx.fillRect(0, 0, S, S)
+    for (let c = 0; c < cols; c++) {
+      const x0 = c * colW
+      const dir = c % 2 === 0 ? 1 : -1
+      const offset = c % 2 === 0 ? 0 : step / 2
+      for (let k = -4; k < S / step + 4; k++) {
+        const y = k * step + offset
+        const t = rand()
+        const r = a[0] + (b[0] - a[0]) * t
+        const g = a[1] + (b[1] - a[1]) * t
+        const bl = a[2] + (b[2] - a[2]) * t
+        const poly = (ctx: CanvasRenderingContext2D) => {
+          ctx.beginPath()
+          ctx.moveTo(x0 + 1, y + 1)
+          ctx.lineTo(x0 + colW - 1, y + dir * colW + 1)
+          ctx.lineTo(x0 + colW - 1, y + dir * colW + step - 1)
+          ctx.lineTo(x0 + 1, y + step - 1)
+          ctx.closePath()
+        }
+        // wrap vertically so the texture tiles
+        for (const wrap of [-S, 0, S]) {
+          color.ctx.save()
+          color.ctx.translate(0, wrap)
+          poly(color.ctx)
+          color.ctx.fillStyle = `rgb(${r | 0},${g | 0},${bl | 0})`
+          color.ctx.fill()
+          color.ctx.clip()
+          // grain along the plank
+          for (let l = 0; l < 9; l++) {
+            const o = rand() * step
+            color.ctx.strokeStyle = `rgba(80,50,25,${0.06 + rand() * 0.1})`
+            color.ctx.lineWidth = 1 + rand() * 1.5
+            color.ctx.beginPath()
+            color.ctx.moveTo(x0, y + o)
+            color.ctx.lineTo(x0 + colW, y + dir * colW + o)
+            color.ctx.stroke()
+          }
+          color.ctx.restore()
+          rough.ctx.save()
+          rough.ctx.translate(0, wrap)
+          poly(rough.ctx)
+          rough.ctx.fillStyle = `rgb(${110 + rand() * 30},${110 + rand() * 30},${110 + rand() * 30})`
+          rough.ctx.fill()
+          rough.ctx.restore()
+        }
+      }
+    }
+    return { map: toTexture(color.c, true), roughnessMap: toTexture(rough.c, false) }
+  })
+}
+
+/**
+ * Frosted window film with botanical leaf graphics, used on the lower part
+ * of the cabin glass (RGBA, applied on a transparent plane).
+ * One repeat covers ~2.4 m x 1.2 m.
+ */
+export function botanicalFilmTexture() {
+  return cached('botanical', () => {
+    const W = 1024
+    const H = 512
+    const { c, ctx } = canvas(W, H)
+    ctx.fillStyle = 'rgba(236,240,238,0.62)'
+    ctx.fillRect(0, 0, W, H)
+    const rand = mulberry32(9)
+    const leaf = (x: number, y: number, len: number, wid: number, ang: number, shade: number, alpha: number) => {
+      ctx.save()
+      ctx.translate(x, y)
+      ctx.rotate(ang)
+      ctx.fillStyle = `rgba(${70 + shade},${104 + shade},${88 + shade},${alpha})`
+      ctx.beginPath()
+      ctx.moveTo(0, 0)
+      ctx.quadraticCurveTo(wid, -len * 0.45, 0, -len)
+      ctx.quadraticCurveTo(-wid, -len * 0.45, 0, 0)
+      ctx.fill()
+      ctx.strokeStyle = `rgba(230,236,232,${alpha * 0.6})`
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.moveTo(0, 0)
+      ctx.lineTo(0, -len * 0.95)
+      ctx.stroke()
+      ctx.restore()
+    }
+    // palm / monstera-like fronds rising from the bottom edge
+    for (let i = 0; i < 18; i++) {
+      const bx = (i / 18) * W + rand() * 40
+      const stemAng = (rand() - 0.5) * 0.9
+      const len = 260 + rand() * 220
+      const leaflets = 7 + Math.floor(rand() * 6)
+      const shade = Math.floor(rand() * 30)
+      const alpha = 0.45 + rand() * 0.25
+      for (let k = 1; k <= leaflets; k++) {
+        const t = k / (leaflets + 1)
+        const px = bx + Math.sin(stemAng) * len * t
+        const py = H + 10 - Math.cos(stemAng) * len * t
+        const size = (1 - t * 0.6) * (70 + rand() * 50)
+        leaf(px, py, size, size * 0.38, stemAng - 1.1 - rand() * 0.3, shade, alpha)
+        leaf(px, py, size, size * 0.38, stemAng + 1.1 + rand() * 0.3, shade, alpha)
+      }
+      leaf(bx + Math.sin(stemAng) * len, H + 10 - Math.cos(stemAng) * len, 80, 30, stemAng, shade, alpha)
+    }
+    const t = toTexture(c, true)
+    t.wrapT = THREE.ClampToEdgeWrapping
+    return t
+  })
+}
+
+/** Light venetian blinds (horizontal slats). */
+export function blindsTexture() {
+  return cached('blinds', () => {
+    const { c, ctx } = canvas(64, 256)
+    for (let y = 0; y < 256; y += 16) {
+      const g = ctx.createLinearGradient(0, y, 0, y + 16)
+      g.addColorStop(0, '#fbf6ee')
+      g.addColorStop(0.7, '#e8dfd1')
+      g.addColorStop(1, '#b9b0a2')
+      ctx.fillStyle = g
+      ctx.fillRect(0, y, 64, 16)
+    }
+    return toTexture(c, true)
+  })
+}

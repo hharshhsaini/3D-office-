@@ -1,7 +1,14 @@
 import * as THREE from 'three'
-import { COLORS } from '../config/appearance'
-import { RED_FEATURE_WALL } from '../config/layout'
-import { floorTileTextures, marbleTexture, redChevronTextures, woodTexture } from './textures'
+import { CHEVRON_REPEAT, COLORS, FLOOR_TILE_SIZE, WOOD_FLOOR_REPEAT } from '../config/appearance'
+import {
+  blindsTexture,
+  botanicalFilmTexture,
+  floorTileTextures,
+  herringboneWoodTextures,
+  marbleTexture,
+  redChevronTextures,
+  woodTexture,
+} from './textures'
 
 /**
  * Shared materials. Created lazily once and reused by every component so the
@@ -14,7 +21,7 @@ function make() {
   const redMap = chevron.map.clone()
   const redBump = chevron.bumpMap.clone()
   for (const t of [redMap, redBump]) {
-    t.repeat.set(1 / RED_FEATURE_WALL.chevronRepeat, 1 / RED_FEATURE_WALL.chevronRepeat)
+    t.repeat.set(1 / CHEVRON_REPEAT, 1 / CHEVRON_REPEAT)
     t.needsUpdate = true
   }
 
@@ -23,14 +30,33 @@ function make() {
   woodAcross.rotation = Math.PI / 2
   woodAcross.needsUpdate = true
 
+  const herring = herringboneWoodTextures()
+
+  const emissive = (color: string, intensity: number) =>
+    new THREE.MeshStandardMaterial({
+      color: '#ffffff',
+      emissive: new THREE.Color(color),
+      emissiveIntensity: intensity,
+      toneMapped: false,
+    })
+
   return {
     floorTiles: new THREE.MeshStandardMaterial({
       map: floor.map,
       roughnessMap: floor.roughnessMap,
-      roughness: 1,
+      roughness: 0.9,
       metalness: 0,
+      envMapIntensity: 0.7,
+    }),
+    /** metres covered by one repeat of the tile texture */
+    floorTileRepeat: floor.tilesPerRepeat * FLOOR_TILE_SIZE,
+    woodFloor: new THREE.MeshStandardMaterial({
+      map: herring.map,
+      roughnessMap: herring.roughnessMap,
+      roughness: 0.85,
       envMapIntensity: 0.6,
     }),
+    woodFloorRepeat: WOOD_FLOOR_REPEAT,
     wall: new THREE.MeshStandardMaterial({ color: COLORS.wall, roughness: 0.92 }),
     wallGrey: new THREE.MeshStandardMaterial({ color: COLORS.wallLightGrey, roughness: 0.9 }),
     logoPanel: new THREE.MeshStandardMaterial({ color: COLORS.logoPanel, roughness: 0.85 }),
@@ -62,6 +88,14 @@ function make() {
       depthWrite: false,
       side: THREE.DoubleSide,
     }),
+    botanicalFilm: new THREE.MeshStandardMaterial({
+      map: botanicalFilmTexture(),
+      transparent: true,
+      roughness: 0.7,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    }),
+    blinds: new THREE.MeshStandardMaterial({ map: blindsTexture(), roughness: 0.8, side: THREE.DoubleSide }),
     redBand: new THREE.MeshStandardMaterial({
       color: COLORS.red,
       roughness: 0.5,
@@ -102,19 +136,32 @@ function make() {
     tableTop: new THREE.MeshStandardMaterial({ color: COLORS.tableTop, map: wood, roughness: 0.5 }),
     plastic: new THREE.MeshStandardMaterial({ color: '#1b1b1d', roughness: 0.4, metalness: 0.1 }),
 
+    // Open workspace furniture
+    greenTable: new THREE.MeshStandardMaterial({ color: COLORS.greenTable, roughness: 0.55 }),
+    whiteLaminate: new THREE.MeshStandardMaterial({ color: COLORS.whiteLaminate, roughness: 0.5 }),
+    officeChair: new THREE.MeshStandardMaterial({ color: COLORS.officeChair, roughness: 0.85 }),
+    officeChairFrame: new THREE.MeshStandardMaterial({ color: COLORS.officeChairFrame, roughness: 0.4, metalness: 0.6 }),
+    monitor: new THREE.MeshStandardMaterial({ color: COLORS.monitor, roughness: 0.35, metalness: 0.2 }),
+    screen: new THREE.MeshStandardMaterial({
+      color: '#0b0d12',
+      emissive: new THREE.Color('#1b2a44'),
+      emissiveIntensity: 0.6,
+      roughness: 0.2,
+    }),
+    planterRim: new THREE.MeshStandardMaterial({ color: COLORS.planterRim, roughness: 0.5 }),
+    fabricDivider: new THREE.MeshStandardMaterial({ color: '#e7e4dc', roughness: 0.9 }),
+    fridge: new THREE.MeshStandardMaterial({ color: COLORS.fridge, roughness: 0.3, metalness: 0.5 }),
+    washroomDoor: new THREE.MeshStandardMaterial({ color: COLORS.washroomDoor, roughness: 0.45 }),
+
+    // Ceiling
+    ceilingGreen: new THREE.MeshStandardMaterial({ color: COLORS.ceilingGreen, roughness: 0.9 }),
+    acUnit: new THREE.MeshStandardMaterial({ color: COLORS.acUnit, roughness: 0.6 }),
+    acGrille: new THREE.MeshStandardMaterial({ color: '#c9cbcc', roughness: 0.8 }),
+    sphereLamp: emissive('#fff1dc', 2.2),
+
     // Light emitters (visible fixtures)
-    ledWhite: new THREE.MeshStandardMaterial({
-      color: '#ffffff',
-      emissive: new THREE.Color(COLORS.neutralLight),
-      emissiveIntensity: 6,
-      toneMapped: false,
-    }),
-    ledWarm: new THREE.MeshStandardMaterial({
-      color: '#ffffff',
-      emissive: new THREE.Color(COLORS.warmLight),
-      emissiveIntensity: 4,
-      toneMapped: false,
-    }),
+    ledWhite: emissive(COLORS.neutralLight, 6),
+    ledWarm: emissive(COLORS.warmLight, 4),
     downlightTrim: new THREE.MeshStandardMaterial({ color: '#e8e8e8', roughness: 0.4, metalness: 0.3 }),
   }
 }

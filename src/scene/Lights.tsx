@@ -2,7 +2,7 @@ import { useState } from 'react'
 import * as THREE from 'three'
 import { Environment, Lightformer } from '@react-three/drei'
 import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib.js'
-import { CEILING_HEIGHT } from '../config/layout'
+import { CEILING_HEIGHT, OFFICE } from '../config/office'
 import { COLORS } from '../config/appearance'
 import { getMaterials } from './materials'
 import { useSceneSettings } from './SceneSettings'
@@ -17,6 +17,10 @@ export const LIGHT_LEVELS = {
   featureWallSpot: 7,
   ambientHemisphere: 0.45,
   environment: 0.4,
+  /** soft overhead fill over the open workspace */
+  workspaceFill: 1.6,
+  /** shadow-casting overhead light for the whole floor */
+  keyLight: 0.55,
 }
 
 /** Spot light with its target kept in the scene graph. */
@@ -70,12 +74,15 @@ export function LinearLed({
   y = CEILING_HEIGHT,
   intensity = LIGHT_LEVELS.linearLed,
   width = 0.05,
+  light = true,
 }: {
   from: [number, number]
   to: [number, number]
   y?: number
   intensity?: number
   width?: number
+  /** false = visible fixture only (keeps the light count down) */
+  light?: boolean
 }) {
   const m = getMaterials()
   const { showCeiling } = useSceneSettings()
@@ -96,14 +103,16 @@ export function LinearLed({
           <boxGeometry args={[length, 0.004, width]} />
         </mesh>
       </group>
-      <rectAreaLight
-        position={[0, -0.02, 0]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        width={length}
-        height={0.12}
-        color={COLORS.neutralLight}
-        intensity={intensity}
-      />
+      {light && (
+        <rectAreaLight
+          position={[0, -0.02, 0]}
+          rotation={[-Math.PI / 2, 0, 0]}
+          width={length}
+          height={0.12}
+          color={COLORS.neutralLight}
+          intensity={intensity}
+        />
+      )}
     </group>
   )
 }
@@ -119,6 +128,7 @@ export function Downlight({
   castShadow = false,
   radius = 0.05,
   inCeiling = true,
+  light = true,
 }: {
   x: number
   z: number
@@ -131,6 +141,8 @@ export function Downlight({
   radius?: number
   /** fixtures recessed in furniture (e.g. the feature-wall frame) stay visible in plan view */
   inCeiling?: boolean
+  /** false = visible fixture only (keeps the light count down) */
+  light?: boolean
 }) {
   const m = getMaterials()
   const { showCeiling } = useSceneSettings()
@@ -144,14 +156,16 @@ export function Downlight({
           <circleGeometry args={[radius, 32]} />
         </mesh>
       </group>
-      <Spot
-        position={[x, y - 0.03, z]}
-        target={aim ?? [x, 0, z]}
-        color={COLORS.warmLight}
-        intensity={intensity}
-        angle={angle}
-        castShadow={castShadow}
-      />
+      {light && (
+        <Spot
+          position={[x, y - 0.03, z]}
+          target={aim ?? [x, 0, z]}
+          color={COLORS.warmLight}
+          intensity={intensity}
+          angle={angle}
+          castShadow={castShadow}
+        />
+      )}
     </group>
   )
 }
@@ -204,11 +218,97 @@ export function Pendant({
   )
 }
 
+/** White spherical pendant (open workspace), emissive only. */
+export function SpherePendant({ x, z, bottomY, radius = 0.13 }: { x: number; z: number; bottomY: number; radius?: number }) {
+  const m = getMaterials()
+  const { showCeiling } = useSceneSettings()
+  const cy = bottomY + radius
+  return (
+    <group>
+      {showCeiling && (
+        <mesh position={[x, (CEILING_HEIGHT + cy + radius) / 2, z]} material={m.plastic}>
+          <cylinderGeometry args={[0.003, 0.003, CEILING_HEIGHT - cy - radius, 6]} />
+        </mesh>
+      )}
+      <mesh position={[x, cy, z]} material={m.sphereLamp}>
+        <sphereGeometry args={[radius, 24, 16]} />
+      </mesh>
+    </group>
+  )
+}
+
+/** 4-way ceiling cassette air conditioner (600 x 600 mm). */
+export function AcCassette({ x, z }: { x: number; z: number }) {
+  const m = getMaterials()
+  const { showCeiling } = useSceneSettings()
+  if (!showCeiling) return null
+  const y = CEILING_HEIGHT
+  return (
+    <group position={[x, y, z]}>
+      <mesh position={[0, -0.012, 0]} material={m.acUnit}>
+        <boxGeometry args={[0.68, 0.024, 0.68]} />
+      </mesh>
+      <mesh position={[0, -0.026, 0]} material={m.acGrille}>
+        <boxGeometry args={[0.36, 0.006, 0.36]} />
+      </mesh>
+      {/* four air outlets */}
+      {[0, 1, 2, 3].map((i) => (
+        <mesh key={i} position={[Math.sin((i * Math.PI) / 2) * 0.27, -0.026, Math.cos((i * Math.PI) / 2) * 0.27]} rotation={[0, (i * Math.PI) / 2, 0]} material={m.plastic}>
+          <boxGeometry args={[0.5, 0.004, 0.05]} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+/** Soft rectangular fill light pointing down (stands in for many ceiling fixtures). */
+export function CeilingFill({ x0, x1, z0, z1, intensity = LIGHT_LEVELS.workspaceFill }: { x0: number; x1: number; z0: number; z1: number; intensity?: number }) {
+  return (
+    <rectAreaLight
+      position={[(x0 + x1) / 2, CEILING_HEIGHT - 0.05, (z0 + z1) / 2]}
+      rotation={[-Math.PI / 2, 0, 0]}
+      width={x1 - x0}
+      height={z1 - z0}
+      color={COLORS.neutralLight}
+      intensity={intensity}
+    />
+  )
+}
+
+/** Overhead shadow-casting light covering the whole office floor. */
+function KeyLight() {
+  const [target] = useState(() => new THREE.Object3D())
+  const cx = OFFICE.width / 2
+  const cz = OFFICE.length / 2
+  return (
+    <>
+      <primitive object={target} position={[cx, 0, cz]} />
+      <directionalLight
+        position={[cx - 2, 14, cz + 3]}
+        target={target}
+        intensity={LIGHT_LEVELS.keyLight}
+        color="#fff4e6"
+        castShadow
+        shadow-mapSize={[2048, 2048]}
+        shadow-bias={-0.0004}
+        shadow-normalBias={0.03}
+        shadow-camera-left={-12}
+        shadow-camera-right={12}
+        shadow-camera-top={12}
+        shadow-camera-bottom={-12}
+        shadow-camera-near={1}
+        shadow-camera-far={30}
+      />
+    </>
+  )
+}
+
 /** Ambient fill + image-based lighting built from local light formers (no downloads). */
 export function GlobalLighting() {
   const { highQuality } = useSceneSettings()
   return (
     <>
+      <KeyLight />
       {/* sky = light from the ceiling fixtures, ground = warm bounce from the floor (lights the ceiling) */}
       <hemisphereLight args={['#fffaf2', '#e6dccd', LIGHT_LEVELS.ambientHemisphere]} />
       <Environment resolution={highQuality ? 256 : 128} frames={1} environmentIntensity={LIGHT_LEVELS.environment}>

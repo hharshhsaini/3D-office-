@@ -1,13 +1,11 @@
 # Spacewire Tech – 3D Virtual Office
 
-**Phase 1: reception and entrance prototype**, for layout approval before the rest of
-the office is built.
+A walkable, game-like 3D replica of the Spacewire Tech office. You can walk through it in first person with collision, or orbit it from above.
 
 Built with React, TypeScript, Three.js, React Three Fiber and @react-three/drei.
-Everything is real 3D geometry: floor, walls, ceiling, desk, window, feature wall,
-bench, doors and glass partitions. No panoramas or flat photos are used.
+Everything is real 3D geometry generated from one layout file: walls, glass cabins, desks, chairs, the central planter, ceiling fixtures and doors. There are no panoramas, photos or downloaded 3D models.
 
-![Entrance view](docs/screenshots/01-entrance-view.jpg)
+![First-person view from the main entrance](docs/screenshots/01-entrance-view.jpg)
 
 ## Run it
 
@@ -15,7 +13,7 @@ Requires Node.js 18+ (tested with Node 22).
 
 ```bash
 npm install
-npm run dev          # http://localhost:5173
+npm run dev          # then open http://localhost:5173
 ```
 
 Other scripts:
@@ -26,120 +24,113 @@ npm run build        # production build into dist/
 npm run preview      # serve the production build
 ```
 
-### Controls
-
-| View | How to use it |
+| | |
 | --- | --- |
-| **Entrance view** (default) | Starts at the main entrance, facing the reception desk. Drag to look around, scroll to zoom. **W A S D** or **↑ ↓** to walk, **← →** to turn, **Shift** to walk faster. Walls and furniture block movement. The button resets to the fixed entrance view. |
-| **Overview** | 3D overview with the ceiling removed. Drag to orbit, scroll to zoom, right-drag to pan. |
-| **Plan view** | Top-down view with the entrance at the bottom, the same orientation as the floor plan. Use it to compare against the plan. |
+| ![Overview](docs/screenshots/03-overview.jpg) | ![Open workspace](docs/screenshots/04-workspace.jpg) |
+| ![Cabin corridor](docs/screenshots/05-corridor.jpg) | ![Central planter workstation](docs/screenshots/06-planter.jpg) |
 
-Options:
+## Controls
 
-- **High quality**: polished-floor reflections, ambient occlusion and LED bloom. Untick it on slow laptops.
-- **Plan labels**: names the areas in the Overview and Plan views. These are screen labels, not signage inside the office.
+| Mode | Controls |
+| --- | --- |
+| **First person** (default) | **Click** the view to capture the mouse (pointer lock), then move the mouse to look; **Esc** releases it. You can also drag to look. **W A S D** or **↑ ↓** to walk, **← →** to turn, **Shift** to walk faster, **scroll** to zoom. Walls, glass, closed doors and furniture block you. Cabin and small-cabin doors open automatically as you approach. |
+| **Overview** | High-angle 3D view with the ceiling removed. **Drag** to rotate, **scroll** to zoom, **right-drag** to pan. **Click an area label** to fly down and walk from there. |
+| **2D floor plan** | The top-down plan, with north at the top as in the annotated image. Click an area to walk there. In first person, the minimap in the corner shows where you are. |
 
-URL parameters:
+Switching between first person and the overview is a smooth camera flight.
+**Main entrance** takes you back to the start point.
+**High quality** turns on ambient occlusion and bloom; untick it on slower laptops.
 
-- `?view=plan` or `?view=overview` opens that view directly.
+URL options:
+
+- `?view=overview` opens the overview directly.
 - `?quality=low` turns off high quality.
-- `?cam=x,z,yaw,pitch` starts the walk-through at a given spot and direction, which is handy for sharing a viewpoint. For example, `?cam=1,1.8,-80,0` looks into the interview cabin. Yaw 0 faces the desk, 90 faces left and −90 faces right.
+- `?plan=1` opens the 2D plan.
+- `?intro=0` skips the opening fly-in.
+- `?cam=x,z,yaw` starts first person at a given point. Coordinates are metres; yaw 0 = north, 90 = west, −90 = east, 180 = south.
 
-## How the reception layout was interpreted
+## The layout
 
-![Plan view](docs/screenshots/02-plan-view.jpg)
+![2D floor plan](docs/floor-plan.svg)
 
-```
-              BACK WALL (logo + window) – closed, no doorway
-        ┌─────────────────────────────────┐
-        │   [ RECEPTION  DESK ]   [win]   │▐ RED FEATURE
-        │                                 │▐ WALL + BENCH
-        │                                 │▐
-        │                      glass door ╞═════════════► corridor to the
-        │                                 ├────┐           main office
-        │ plant                           │ IC │ INTERVIEW CABIN
-        └──────────[ ENTRANCE ]───────────┴────┘
-                         ▲ visitor
-```
+The annotated floor plan image is the source of truth for positions. It was read like this, with north at the top and the main entrance at the bottom right:
 
-The lobby is about 5.0 × 5.4 m (estimate).
+- **Reception** (bottom left): the main entrance is in its east wall and you walk in facing west. The reception desk is straight ahead, with the logo wall and window behind it on the west wall. The red Spacewire feature wall with its bench is on the right, on the south face of the Actors cabin wall. The small interview cabin, with one table and one chair, is in the reception's north-east corner next to the entrance.
+- **Office entrance**: an open passage, with no door or gate, between the end of the red wall and the small cabin. It leads north into the cabin corridor and the open workspace.
+- **Four cabins** along the west wall, from north to south: HR & Finance, Founders, Tech, Actors. Each has a black-framed glass front on the corridor with a door near its south end, and frosted botanical film on the lower glass. The dividers between cabins are the same glass. The corridor is open to the workspace, with no wall between them.
+- **Open workspace**: wooden herringbone floor. Video Editors (two six-seat benches) at the north end. The central planter workstation in the middle: a white-bordered planter with greenery, green tables on all four sides and 12 seats. AI Video Makers / Marketing Team (two six-seat benches) below it.
+- **Eating area and washroom**: the eating area has a lunch counter with stools and a fridge along the washroom wall. The washroom door is entered from the eating area. Only the washroom's closed exterior and door are modelled.
+- **Stairs** (bottom right) are excluded from the model, as instructed.
 
-- **Entrance:** a black-framed double glass door in the front (bottom) wall. The visitor walks in facing the back wall.
-- **Reception desk:** directly in front of the entrance, on the same centre line, with its front facing the entrance. It has a white marble-style front panel, natural wood end blocks, a warm LED glow under the panel, a marble ledge, and a receptionist work surface with a monitor behind it.
-- **Wall behind the desk:** a closed wall. It carries a feature panel with the dark Spacewire "S" and "Spacewire Tech" in 3D letters, three pendant lights, and a window to the right of the logo, as in the latest reception reference. There is no corridor, hallway or doorway behind the desk.
-- **Red feature wall:** on the right side wall, directly to the visitor's right. It has a natural wood box frame, a deep-red chevron upholstered panel, a large white "S", a built-in red cushioned bench (3 cushions) and warm downlights in the top of the frame. It is not behind the desk.
-- **Small interview cabin:** a very small enclosed room (about 1.4 × 1.6 m) next to the entrance on the right. It has a black-framed glass front and glass door, and holds one chair and one small round table, nothing else.
-- **Office corridor:** starts beyond the reception area, through a black-framed glass partition and door in the right wall, between the red feature wall and the interview cabin. Where the corridor runs beside the cabin, the cabin's solid side wall forms the corridor wall. It is narrow (1.3 m), with glass partitions, a red band on the right-hand glass and a white linear LED down the centre, as in the corridor photo. The 4 m stub ends at a glass door to the main office, which is the next phase. The corridor glass is frosted for now, because the rooms behind it are not built yet.
-- **Materials and lighting:** large light-grey square floor tiles, warm off-white walls, black aluminium frames, white linear LED strips, and warm recessed lights and pendants. Shadows are real-time.
+Before building the 3D scene, the metric plan was projected back onto the annotated image (correcting for its perspective) and checked area by area. Rooms, walls, doors and workstation groups all land on the positions drawn in the image.
 
-### Review status
+### Assumptions to confirm with the office photographs
 
-- **Confirmed in review:** entrance, reception desk, window wall, red feature wall and interview cabin positions. The corridor was moved from the left wall to the right wall and all sizes were made more compact, as requested.
-- **Dimensions:** all are reasonable estimates and are marked `ESTIMATE` in the config. Measured sizes can be typed in directly.
-- **Source:** the hand-drawn floor plan was not among the images received. The layout follows the written brief, the photo captions, the latest reception concept and the review feedback above.
-
-## Adjusting the layout
-
-All positions, sizes and rotations are in **`src/config/layout.ts`**, with clearly named constants and a coordinate diagram at the top:
-
-| Constant | Controls |
-| --- | --- |
-| `LOBBY`, `CEILING_HEIGHT`, `WALL_THICKNESS` | Room size |
-| `ENTRANCE` | Door position on the front wall, width and height |
-| `RECEPTION_DESK` | Position (follows the entrance by default), size, gap to the back wall, end-block widths, rotation |
-| `LOGO_WALL`, `BACK_WINDOW`, `PENDANTS` | Logo panel, logo/lettering size and height, window position and size, pendant lights |
-| `RED_FEATURE_WALL` | Which wall, extent, frame depth, logo size, cushions, downlights, chevron size |
-| `INTERVIEW_CABIN` | Which wall, extent, depth, door, table and chair positions |
-| `CORRIDOR` | Which wall, width, length, door, frosted glass, red band |
-| `LINEAR_LEDS`, `DOWNLIGHTS`, `FLOOR_PLANTS`, `DESK_PLANTS` | Fixtures and plants |
-| `INITIAL_CAMERA` | The fixed first view from the entrance |
-
-Coordinates: **+X = visitor's right, −Z = straight ahead (towards the desk), Y = up**, in metres, with the origin at the centre of the lobby floor. The feature wall, cabin and corridor can each be moved to another wall by changing their `wall` field.
-
-Colours, tile size and finishes are in `src/config/appearance.ts`. Light levels are in `LIGHT_LEVELS` in `src/scene/Lights.tsx`.
-
-## Branding assets
-
-- **Logo:** `public/assets/spacewire-s-mark.svg` is the Spacewire "S", **traced from the supplied reception reference image** (`tools/trace_logo.py`), because no logo file was provided. Replace it with the official vector logo under the same file name and both 3D logos update automatically. The SVG must be a filled path.
-- **Lettering:** "Spacewire Tech" uses a subset of the Inter Medium typeface (SIL Open Font License, see `public/fonts/`). If Spacewire has a brand typeface, it can be converted the same way.
+- **Dimensions** are estimated from the image's proportions: about 10 m × 19.4 m inside, with 3.5 m cabins. They are marked `ESTIMATE` in the config.
+- **Cabin interiors** follow the annotated image: one green desk, two staff chairs and one visitor chair. The earlier concept captions described a sofa and shooting setup for Actors and a meeting table for Founders. Those can be added once photos confirm them.
+- **Windows** are on the west wall (one per cabin, plus the reception window) and the north wall (two, above the Video Editors). Cabin and north windows have venetian blinds.
+- **Ceiling**: green ceiling sections over the workspace, cassette AC units, white sphere pendants (positions from the image) and linear LEDs. The exact layout needs ceiling photos.
+- **Washroom door** faces the eating area, following the annotation arrow.
 
 ## Status
 
-**Working**
+**Working and tested**
 
-- 3D reception and entrance: floor, walls, ceiling, entrance door, desk, logo wall, window, red feature wall and bench, interview cabin, start of the corridor.
-- PBR materials with procedural textures (tiles, marble, wood, red chevron).
-- Linear LED, recessed and pendant lighting with real-time shadows. Image-based reflections from local light formers; no downloads needed.
-- Optional high-quality mode: floor reflections, ambient occlusion and bloom.
-- Fixed initial entrance view, free-look, zoom, keyboard walking with collision, and the Overview and Plan views.
-- Verified in a headless Chromium (software WebGL) in dev and production builds, with no runtime errors. Screenshots are in `docs/screenshots/`.
+- The full office in 3D, generated from the config: shell and windows, four glass cabins, open workspace, central planter workstation, eating area, closed washroom, small cabin and reception.
+- First-person walking with pointer lock, WASD, sprint, zoom and smooth acceleration. Collision covers walls, glass, closed doors and furniture. Cabin doors open automatically.
+- The overview, smooth camera flights between modes, clickable area labels, a live minimap and the 2D plan.
+- A collision flood-fill test confirms every room and every hotspot is reachable from the entrance. The washroom interior, the stairs and the outside are not reachable.
+- Interactive checks in a headless browser: walking stops at the reception desk, hotspots fly to the right spot, and a cabin door opens as you walk through. No console errors in development or production builds.
 
-**Not done yet (by design, for later phases)**
+**Needs your input**
 
-- The rest of the office: main office floor, team areas, HR/Founders/Tech/Actors cabins, lunch slab and washroom.
-- Google-Maps-style navigation (hotspots, click-to-move, minimap).
-- The office photographs are not used as textures. Floor, marble, wood and fabric are procedural approximations.
+- Office photographs, to match the cabin interiors, ceiling (green sections, AC and light positions), windows and finishes exactly.
+- Real dimensions (overall length and width, cabin sizes). These are one-line changes in the config.
 
-**Known limitations**
+## Changing the layout
 
-- The traced logo is accurate in shape but slightly soft at the edges. Use the official SVG for a crisp result.
-- Performance has only been checked under software rendering. On a normal laptop GPU it should run smoothly; if not, untick **High quality**.
+Everything is in **`src/config/office.ts`**, with a plan diagram at the top:
+
+| Constant | Controls |
+| --- | --- |
+| `OFFICE`, `GRID`, `CEILING_HEIGHT` | Overall size and the main grid lines (cabin fronts, corridor, eating area, washroom, reception) |
+| `AREAS` | Rooms and zones: floor type (tile or wood), labels and the walk-to viewpoint |
+| `CABINS`, `CABIN_DOOR`, `CABIN_FURNITURE` | Cabin order and sizes, door position, desk, chairs and monitors |
+| `WALLS` | Exterior and interior walls with their windows and doors |
+| `GLASS` | Glass partitions, botanical film and automatic doors |
+| `RECEPTION`, `SMALL_CABIN`, `MAIN_ENTRANCE` | Reception desk, logo wall, pendants, red feature wall, small cabin, entrance |
+| `BENCHES`, `BENCH`, `PLANTER_WORKSTATION` | Workstation clusters and the central planter |
+| `EATING_AREA`, `WASHROOM_DOOR` | Lunch counter, stools, fridge, washroom door |
+| `CEILING` | Green ceiling sections, AC cassettes, sphere pendants, linear LEDs |
+| `SPAWN`, `HOTSPOTS`, `OVERVIEW_CAMERA` | Start point, clickable areas, overview camera |
+
+The 3D scene, the 2D plan, the minimap, the hotspots and the collision map are all generated from this file, so they stay in sync. Colours and finishes are in `src/config/appearance.ts`; light levels are in `LIGHT_LEVELS` in `src/scene/Lights.tsx`.
+
+## Branding assets
+
+- **Logo:** `public/assets/spacewire-s-mark.svg` was traced from the supplied reception reference. Replace it with the official vector logo under the same file name and every 3D logo updates.
+- **Lettering:** "Spacewire Tech" uses a subset of Inter Medium (SIL Open Font License, see `public/fonts/`).
 
 ## Project structure
 
 ```
 src/
-  config/layout.ts        ← every position / size / rotation
-  config/appearance.ts    ← colours, tile size
-  scene/Reception.tsx     ← assembles the scene
-  scene/ReceptionDesk.tsx, BackWall.tsx, RedFeatureWall.tsx,
-        InterviewCabin.tsx, Corridor.tsx, Entrance.tsx
-  scene/GlassPartition.tsx  black-framed glass partitions and doors
-  scene/primitives.tsx      walls with openings, floor/ceiling patches
-  scene/Lights.tsx          LED strips, downlights, pendants, environment
-  scene/CameraRig.tsx       entrance walk/look controls, overview/plan cameras
-  scene/textures.ts         procedural textures
+  config/office.ts          ← the whole layout (single source of truth)
+  config/appearance.ts      ← colours, tile / wood sizes
+  scene/Office.tsx          ← assembles the office
+  scene/OfficeShell.tsx     walls, windows + blinds, doors, floors, outside view
+  scene/GlassPartition.tsx  black-framed glass, botanical film, automatic doors
+  scene/Ceiling.tsx         ceiling, green sections, AC units, pendants, LEDs
+  scene/ReceptionArea.tsx   reception desk, logo wall, red feature wall, small cabin
+  scene/OfficeFurniture.tsx instanced chairs / monitors, benches, planter, cabin desks, eating area
+  scene/placements.ts       every chair / monitor / desk position (shared by 3D, plan, collisions)
+  scene/Lights.tsx, materials.ts, textures.ts, Plant.tsx, Furniture.tsx, SpacewireLogo.tsx
+  nav/Navigation.tsx        first-person controller, overview orbit, camera flights
+  nav/colliders.ts          collision map + wall sliding
+  nav/player.ts, nav/hud.ts visitor state, area name, minimap marker
+  ui/FloorPlan2D.tsx        2D plan / minimap (SVG)
+  ui/Hotspots.tsx, ui/Overlay.tsx
 public/assets/spacewire-s-mark.svg
 public/fonts/inter-medium-spacewire.typeface.json
-tools/trace_logo.py       how the logo was traced from the reference image
+tools/trace_logo.py         how the logo was traced from the reference image
 ```
