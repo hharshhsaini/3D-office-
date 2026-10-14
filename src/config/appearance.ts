@@ -31,8 +31,9 @@ export const COLORS = {
   chairFabric: '#3b3b3d',
   tableTop: '#d8b98e',
   // Open workspace (annotated plan image)
-  greenTable: '#3d6a54',
+  greenTable: '#2f5443', // deep green table tops (office photo)
   whiteLaminate: '#f0efeb',
+  deskScreen: '#ece4d2', // cream desk divider panels
   officeChair: '#c3c7cb',
   officeChairFrame: '#7f858b',
   monitor: '#1a1b1e',

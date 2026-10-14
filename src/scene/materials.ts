@@ -150,6 +150,7 @@ function make() {
     }),
     planterRim: new THREE.MeshStandardMaterial({ color: COLORS.planterRim, roughness: 0.5 }),
     fabricDivider: new THREE.MeshStandardMaterial({ color: '#e7e4dc', roughness: 0.9 }),
+    deskScreen: new THREE.MeshStandardMaterial({ color: COLORS.deskScreen, roughness: 0.6 }),
     fridge: new THREE.MeshStandardMaterial({ color: COLORS.fridge, roughness: 0.3, metalness: 0.5 }),
     washroomDoor: new THREE.MeshStandardMaterial({ color: COLORS.washroomDoor, roughness: 0.45 }),
 

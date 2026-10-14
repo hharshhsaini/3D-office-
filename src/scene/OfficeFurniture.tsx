@@ -124,7 +124,8 @@ export function Monitors() {
 }
 
 // ---------------------------------------------------------------------------
-// Double-sided bench desk (green tops, white frame, fabric divider)
+// Double-sided bench desk, as in the office photo: deep green top, white
+// corner legs, one cream divider panel per facing seat pair (on wooden feet).
 // ---------------------------------------------------------------------------
 function BenchDesk({ bench }: { bench: (typeof BENCHES)[number] }) {
   const m = getMaterials()
@@ -132,18 +133,32 @@ function BenchDesk({ bench }: { bench: (typeof BENCHES)[number] }) {
   const cx = bench.center[0]
   const h = BENCH.height
   const t = 0.03
+  const legs: [number, number][] = [
+    [r.x0 + 0.06, r.z0 + 0.06],
+    [r.x1 - 0.06, r.z0 + 0.06],
+    [r.x0 + 0.06, r.z1 - 0.06],
+    [r.x1 - 0.06, r.z1 - 0.06],
+  ]
+  const screens = Array.from({ length: bench.seatsPerSide }, (_, i) => r.z0 + BENCH.seatWidth * (i + 0.5))
+  const screenW = BENCH.seatWidth - 0.1
   return (
     <group>
-      <BoxFromTo min={[r.x0, h - t, r.z0]} max={[cx - 0.01, h, r.z1]} material={m.greenTable} />
-      <BoxFromTo min={[cx + 0.01, h - t, r.z0]} max={[r.x1, h, r.z1]} material={m.greenTable} />
-      {/* fabric divider between facing desks */}
-      <BoxFromTo min={[cx - 0.015, h, r.z0 + 0.02]} max={[cx + 0.015, h + 0.38, r.z1 - 0.02]} material={m.fabricDivider} />
-      {/* white end and middle supports */}
-      {[r.z0 + 0.02, (r.z0 + r.z1) / 2, r.z1 - 0.05].map((z) => (
-        <BoxFromTo key={z} min={[r.x0 + 0.05, 0, z]} max={[r.x1 - 0.05, h - t, z + 0.03]} material={m.whiteLaminate} />
+      <BoxFromTo min={[r.x0, h - t, r.z0]} max={[r.x1, h, r.z1]} material={m.greenTable} />
+      {legs.map(([x, z], i) => (
+        <mesh key={i} position={[x, (h - t) / 2, z]} material={m.whiteLaminate} castShadow>
+          <cylinderGeometry args={[0.022, 0.016, h - t, 12]} />
+        </mesh>
       ))}
-      {/* cable spine */}
-      <BoxFromTo min={[cx - 0.06, 0.55, r.z0]} max={[cx + 0.06, 0.62, r.z1]} material={m.whiteLaminate} />
+      {/* cable spine under the centre line */}
+      <BoxFromTo min={[cx - 0.05, 0.55, r.z0 + 0.1]} max={[cx + 0.05, 0.6, r.z1 - 0.1]} material={m.officeChairFrame} />
+      {screens.map((z) => (
+        <group key={z} position={[cx, h, z]}>
+          <BoxFromTo min={[-0.01, 0.05, -screenW / 2]} max={[0.01, 0.41, screenW / 2]} material={m.deskScreen} />
+          {[-1, 1].map((s) => (
+            <BoxFromTo key={s} min={[-0.04, 0, s * (screenW / 2 - 0.1) - 0.02]} max={[0.04, 0.09, s * (screenW / 2 - 0.1) + 0.02]} material={m.wood} />
+          ))}
+        </group>
+      ))}
     </group>
   )
 }

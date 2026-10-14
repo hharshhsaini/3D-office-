@@ -368,14 +368,14 @@ export const CABIN_FURNITURE = {
 // ---------------------------------------------------------------------------
 // Open workspace
 // ---------------------------------------------------------------------------
-/** Double-sided bench desks (long axis north-south, chairs on west and east). */
+/** Double-sided bench desks (long axis north-south): 2 seats per side = 4 chairs, as in the office photo. */
 export const BENCHES = [
-  { id: 've-1', group: 'Video Editors', center: [5.5, 1.95] as XZ, seatsPerSide: 3 },
-  { id: 've-2', group: 'Video Editors', center: [8.5, 1.95] as XZ, seatsPerSide: 3 },
-  { id: 'ai-1', group: 'AI Video Makers / Marketing Team', center: [5.7, 9.0] as XZ, seatsPerSide: 3 },
-  { id: 'ai-2', group: 'AI Video Makers / Marketing Team', center: [8.55, 9.0] as XZ, seatsPerSide: 3 },
+  { id: 've-1', group: 'Video Editors', center: [5.5, 1.95] as XZ, seatsPerSide: 2 },
+  { id: 've-2', group: 'Video Editors', center: [8.5, 1.95] as XZ, seatsPerSide: 2 },
+  { id: 'ai-1', group: 'AI Video Makers / Marketing Team', center: [5.7, 9.0] as XZ, seatsPerSide: 2 },
+  { id: 'ai-2', group: 'AI Video Makers / Marketing Team', center: [8.55, 9.0] as XZ, seatsPerSide: 2 },
 ]
-export const BENCH = { seatWidth: 0.7, deskDepth: 0.6, height: 0.75 }
+export const BENCH = { seatWidth: 0.78, deskDepth: 0.6, height: 0.75 }
 
 /** Central planter workstation: white-bordered planter, green tables on all four sides. */
 export const PLANTER_WORKSTATION = {
